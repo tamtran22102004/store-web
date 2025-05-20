@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Thanh toán thành công | Store Style</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="/favicon.ico" />
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="min-h-screen flex flex-col justify-center items-center px-4">
+    <div class="bg-white shadow-lg rounded-2xl p-8 max-w-md text-center">
+      <div class="flex justify-center mb-6">
+        <div class="bg-green-100 text-green-600 p-4 rounded-full">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+      </div>
+      <h1 class="text-2xl font-bold text-green-600 mb-2">Thanh toán thành công!</h1>
+      <p class="text-gray-700 mb-6">Cảm ơn bạn đã mua hàng tại <strong>Store Style</strong>. Đơn hàng của bạn đang được xử lý.</p>
+      <div class="flex flex-col gap-3">
+        <a href="/dashboard" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition">
+          Quay về trang chủ
+        </a>
+        <a href="/orders" class="text-blue-600 hover:underline">
+          Xem đơn hàng của bạn
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

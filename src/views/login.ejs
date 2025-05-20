@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Đăng nhập - Store Style</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col items-center justify-center px-4">
+  <div class="max-w-md w-full">
+    <!-- Logo giả -->
+    <div class="mb-10 flex justify-center">
+      <h1 class="text-4xl font-bold tracking-wide">Store</h1>
+    </div>
+
+    <form method="POST" action="/login-user" class="space-y-8">
+      <div>
+        <label for="username" class="block text-sm font-medium text-gray-900 mb-2">Username</label>
+        <input
+          type="text"
+          name="username"
+          id="username"
+          required
+          placeholder="Nhập username"
+          class="w-full border-b-2 border-gray-900 text-gray-900 py-3 px-2 placeholder-gray-400 focus:outline-none focus:border-black transition"
+        />
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-900 mb-2">Password</label>
+        <input
+          type="password"
+          name="password"
+          id="password"
+          required
+          placeholder="Nhập mật khẩu"
+          class="w-full border-b-2 border-gray-900 text-gray-900 py-3 px-2 placeholder-gray-400 focus:outline-none focus:border-black transition"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="w-full bg-black text-white py-4 font-semibold tracking-wide hover:bg-gray-800 transition"
+      >
+        Đăng nhập
+      </button>
+    </form>
+
+    <% if (error) { %>
+      <p class="mt-6 text-center text-red-600 font-semibold"><%= error %></p>
+    <% } %>
+
+    <p class="mt-8 text-center text-sm text-gray-600">
+      Chưa có tài khoản?
+      <a href="/register" class="font-semibold text-black hover:underline">Đăng ký</a>
+    </p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chi tiết sản phẩm - Store Style</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <!-- Container -->
+  <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-md p-6 grid grid-cols-1 md:grid-cols-2 gap-10">
+    
+    <!-- 🟨 Cột trái – Ảnh sản phẩm -->
+    <div class="w-full">
+      <div class="border rounded-xl overflow-hidden">
+        <img src="<%= product.image %>" alt="<%= product.name %>" class="w-full object-cover rounded-lg">
+      </div>
+    </div>
+
+    <!-- 🟩 Cột phải – Thông tin & lựa chọn -->
+    <div class="space-y-4">
+      <h1 class="text-2xl font-bold text-gray-800"><%= product.name %></h1>
+
+      <!-- Giá -->
+      <div class="text-red-600 text-2xl font-bold">
+        <%= product.base_price.toLocaleString() %>₫
+      </div>
+
+     
+
+      <!-- Màu sắc -->
+      <div>
+        <p class="font-semibold mb-1">Màu sắc:</p>
+        <div id="color-buttons" class="flex flex-wrap gap-2">
+          <% let colors = [...new Set(variants.map(v => v.color))]; %>
+          <% colors.forEach(color => { %>
+            <button 
+              class="color-btn border px-3 py-1 rounded text-sm hover:bg-orange-500 hover:text-white transition"
+              data-color="<%= color %>">
+              <%= color %>
+            </button>
+          <% }) %>
+        </div>
+      </div>
+
+      <!-- Kích cỡ -->
+      <div>
+        <p class="font-semibold mb-1">Kích cỡ:</p>
+        <div id="size-buttons" class="flex flex-wrap gap-2">
+          <!-- Sẽ render bằng JS -->
+        </div>
+      </div>
+
+      <!-- Số lượng còn -->
+      <div>
+        <p id="quantity-info" class="text-gray-600 text-sm italic">
+          Vui lòng chọn màu và kích cỡ
+        </p>
+      </div>
+
+      <!-- Hành động -->
+      <div class="flex items-center gap-4 mt-4">
+        <button id="buy-btn" disabled
+          class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded font-medium disabled:opacity-50">
+          Mua ngay
+        </button>
+        <button id="add-cart-btn" disabled
+          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded font-medium disabled:opacity-50">
+          Thêm vào giỏ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📃 Mô tả chi tiết -->
+  <div class="max-w-6xl mx-auto mt-10 bg-white p-6 rounded-xl shadow-sm">
+    <h2 class="text-xl font-bold mb-3 text-gray-800">Mô tả sản phẩm</h2>
+    <p class="text-gray-700 leading-relaxed whitespace-pre-line">
+      <%= product.description || 'Chưa có mô tả chi tiết.' %>
+    </p>
+  </div>
+
+  
+
+  <%- include('partials/footer') %>
+
+  <!-- 🧠 JS xử lý logic chọn biến thể -->
+  <script>
+    const variants = <%- JSON.stringify(variants) %>;
+    let selectedColor = null;
+    let selectedSize = null;
+
+    const colorBtns = document.querySelectorAll('.color-btn');
+    const sizeBtnsContainer = document.getElementById('size-buttons');
+    const quantityInfo = document.getElementById('quantity-info');
+    const buyBtn = document.getElementById('buy-btn');
+    const addCartBtn = document.getElementById('add-cart-btn');
+
+    function updateSizeButtons(color) {
+      selectedSize = null;
+      const sizes = variants.filter(v => v.color === color);
+      sizeBtnsContainer.innerHTML = '';
+      sizes.forEach(v => {
+        const btn = document.createElement('button');
+        btn.className = 'size-btn border px-3 py-1 rounded text-sm hover:bg-gray-800 hover:text-white transition';
+        btn.textContent = v.size;
+        btn.dataset.size = v.size;
+        btn.onclick = () => {
+          document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('bg-gray-800', 'text-white'));
+          btn.classList.add('bg-gray-800', 'text-white');
+          selectedSize = v.size;
+          updateStockInfo();
+        };
+        sizeBtnsContainer.appendChild(btn);
+      });
+    }
+
+    function updateStockInfo() {
+      const variant = variants.find(v => v.color === selectedColor && v.size === selectedSize);
+      if (variant) {
+        quantityInfo.textContent = 'Số lượng còn: ' + variant.quantity;
+        const inStock = variant.quantity > 0;
+        buyBtn.disabled = !inStock;
+        addCartBtn.disabled = !inStock;
+      } else {
+        quantityInfo.textContent = 'Không tìm thấy biến thể';
+        buyBtn.disabled = true;
+        addCartBtn.disabled = true;
+      }
+    }
+
+    colorBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        colorBtns.forEach(b => b.classList.remove('bg-orange-500', 'text-white'));
+        btn.classList.add('bg-orange-500', 'text-white');
+        selectedColor = btn.dataset.color;
+        updateSizeButtons(selectedColor);
+        quantityInfo.textContent = 'Vui lòng chọn kích cỡ';
+        buyBtn.disabled = true;
+        addCartBtn.disabled = true;
+      });
+    });
+    addCartBtn.addEventListener('click', async () => {
+      if (!selectedColor || !selectedSize) {
+        alert('Vui lòng chọn màu và kích cỡ');
+        return;
+      }
+  
+      const variant = variants.find(v => v.color === selectedColor && v.size === selectedSize);
+      if (!variant) {
+        alert('Không tìm thấy biến thể phù hợp');
+        return;
+      }
+  
+      try {
+        const res = await fetch('/api/cart/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            variantId: variant.id,
+            quantity: 1 // có thể sau này cho chọn số lượng
+          })
+        });
+  
+        const result = await res.json();
+  
+        if (res.ok) {
+          alert('🛒 Đã thêm vào giỏ hàng!');
+        } else {
+          if (res.status === 401) {
+            window.location.href = '/login';
+          } else {
+            alert('❌ ' + result.message);
+          }
+        }
+      } catch (err) {
+        console.error('Lỗi:', err);
+        alert('Lỗi kết nối đến máy chủ');
+      }
+    });
+  </script>
+</body>
+</html>

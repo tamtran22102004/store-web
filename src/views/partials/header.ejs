@@ -1,0 +1,25 @@
+<header class="flex justify-between items-center p-6 border-b border-gray-200">
+    <h1 class="text-3xl font-bold tracking-wide">STORE</h1>
+    <nav class="flex items-center space-x-6">
+        <a href="/dashboard" class="text-gray-700 hover:text-black transition">Trang chủ</a>
+        <a href="/api/products/search-view" class="text-gray-700 hover:text-black transition">Sản phẩm</a>
+        <a href="/api/cart" class="text-gray-700 hover:text-black transition">Giỏ hàng</a>
+        <a href="/api/order" class="text-gray-700 hover:text-black transition">Đơn Hàng</a>
+
+      </nav>
+    <div class="flex items-center gap-4">
+      <% if (typeof userName !== 'undefined') { %>
+        <span class="text-gray-700 font-medium">Xin chào, <%= userName %>!</span>
+      <% } %>
+
+      <form method="get" action="/logout">
+        <button
+          type="submit"
+          class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
+        >
+          Đăng xuất
+        </button>
+      </form>
+    </div>
+  </header>
+  

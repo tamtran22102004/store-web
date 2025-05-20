@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard - Store Style</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col">
+  <!-- Header -->
+  <%- include('partials/header') %>
+
+  <div class="grid grid-cols-10 gap-2 justify-start">
+    <% categories.forEach(category => { %>
+      <div 
+        class="flex flex-col items-center bg-white rounded-xl p-1 hover:shadow-md transition hover:scale-105 cursor-pointer"
+        onclick="loadProducts(<%= category.id %>)"
+      >
+        <img src="<%= category.image %>" alt="<%= category.name %>" 
+             class="w-16 h-16 object-cover rounded-full border border-gray-200 shadow-sm mb-1" />
+        <span class="text-xs font-medium text-gray-700 text-center"><%= category.name %></span>
+      </div>
+    <% }) %>
+  </div>
+  
+  <div id="product-list" class="mt-4 flex flex-row flex-wrap gap-4 justify-center">
+    <p>Chọn một danh mục để xem sản phẩm</p>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+  <%- include('partials/footer') %>
+  <script>
+    async function loadProducts(categoryId) {
+      const productList = document.getElementById('product-list');
+      productList.innerHTML = 'Đang tải sản phẩm...';
+      productList.classList.add('flex', 'flex-wrap', 'gap-4');
+  
+      try {
+        const response = await fetch(`/api/products/${categoryId}`);
+        if (!response.ok) throw new Error('Lỗi khi lấy dữ liệu');
+  
+        const products = await response.json();
+  
+        if (products.length === 0) {
+          productList.innerHTML = '<p>Không có sản phẩm nào trong danh mục này.</p>';
+          return;
+        }
+  
+        const html = products.map(product => `
+          <div 
+            class="product-card border rounded p-3 w-40 flex flex-col items-center shadow-sm hover:shadow-md transition cursor-pointer"
+            data-id="${product.id}"
+          >
+            <img src="${product.image}" alt="${product.name}" class="w-32 h-32 object-cover rounded mb-2" />
+            <h3 class="text-sm font-semibold text-center">${product.name}</h3>
+            <p class="text-xs text-gray-600 mt-1">
+              ${Number(product.base_price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+            </p>
+          </div>
+        `).join('');
+  
+        productList.innerHTML = html;
+  
+        // 🎯 Gắn sự kiện click sau khi render sản phẩm
+        document.querySelectorAll('.product-card').forEach(card => {
+          card.addEventListener('click', () => {
+            const productId = card.dataset.id;
+            if (productId) {
+              window.location.href = `api/products/product/${productId}`;
+            }
+          });
+        });
+  
+      } catch (error) {
+        productList.innerHTML = `<p>Lỗi tải sản phẩm: ${error.message}</p>`;
+      }
+    }
+  </script>
+  
+  
+  
+</body>
+
+</html>

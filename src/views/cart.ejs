@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Giỏ hàng - Store Style</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <div class="max-w-6xl mx-auto mt-8 bg-white p-6 rounded shadow">
+    <h1 class="text-2xl font-bold mb-6">🛒 Giỏ hàng của bạn</h1>
+
+    <% if (cartItems.length === 0) { %>
+      <p>Chưa có sản phẩm nào trong giỏ hàng.</p>
+    <% } else { %>
+      <%
+        let totalPrice = 0;
+        cartItems.forEach(item => {
+          totalPrice += item.base_price * item.quantity;
+        });
+      %>
+
+      <div class="space-y-4">
+        <% cartItems.forEach(item => { %>
+          <div class="flex items-center border-b pb-4">
+            <img src="<%= item.image %>" class="w-20 h-20 object-cover rounded" />
+            <div class="ml-4 flex-1">
+              <h2 class="text-lg font-semibold"><%= item.name %></h2>
+              <p class="text-sm text-gray-600">Màu: <%= item.color %> | Size: <%= item.size %></p>
+              <p class="text-sm text-gray-600">Giá: <%= item.base_price.toLocaleString() %>₫</p>
+              <p class="text-sm text-gray-600">Số lượng: <%= item.quantity %></p>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+
+      <div class="mt-6 text-right text-lg font-semibold">
+        Tổng cộng: <span class="text-orange-600"><%= totalPrice.toLocaleString() %>₫</span>
+      </div>
+
+      <div class="mt-4 text-right">
+        <button onclick="openCheckoutModal()" class="bg-orange-500 text-white px-6 py-2 rounded hover:bg-orange-600">
+          Tiến hành thanh toán
+        </button>
+      </div>
+
+      <!-- Modal -->
+      <div id="checkout-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden">
+        <div class="bg-white w-full max-w-2xl p-6 rounded-lg relative max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+      
+          <h2 class="text-xl font-bold mb-4">🛍️ Xác nhận đơn hàng</h2>
+
+          <!-- 🔸 Danh sách sản phẩm đã chọn -->
+          <div class="space-y-4 mb-4 border-t pt-4">
+            <% cartItems.forEach(item => { %>
+              <div class="flex items-center border rounded p-2">
+                <img src="<%= item.image %>" class="w-16 h-16 object-cover rounded" />
+                <div class="ml-4 flex-1">
+                  <p class="font-semibold"><%= item.name %></p>
+                  <p class="text-sm text-gray-600">Màu: <%= item.color %> | Size: <%= item.size %></p>
+                  <p class="text-sm text-gray-600">Số lượng: <%= item.quantity %></p>
+                  <p class="text-sm text-orange-600 font-bold"><%= item.base_price.toLocaleString() %>₫</p>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+
+          <div class="text-right text-lg font-semibold mb-4">
+            Tổng cộng: <span class="text-orange-600"><%= totalPrice.toLocaleString() %>₫</span>
+          </div>
+
+          <!-- 🔸 Form điền thông tin người mua -->
+          <form action="/api/cart/order" method="POST" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <input type="text" name="name" value="<%= userInfo?.name || '' %>" placeholder="Họ tên người nhận" class="border p-2 rounded" required />
+              <input type="text" name="phone" value="<%= userInfo?.phone || '' %>" placeholder="Số điện thoại" class="border p-2 rounded" required />
+              <input type="email" name="email" value="<%= userInfo?.email || '' %>" placeholder="Email" class="border p-2 rounded col-span-2" required />
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
+              <input type="text" name="province" value="<%= userInfo?.province || '' %>" placeholder="Tỉnh" class="border p-2 rounded" required />
+              <input type="text" name="district" value="<%= userInfo?.district || '' %>" placeholder="Huyện" class="border p-2 rounded" required />
+              <input type="text" name="commune" value="<%= userInfo?.commune || '' %>" placeholder="Xã" class="border p-2 rounded" required />
+            </div>
+
+            <input type="text" name="street_address" value="<%= userInfo?.street_address || '' %>" placeholder="Số nhà, tên đường" class="w-full border p-2 rounded" required />
+
+            <div>
+              <label><input type="radio" name="housing_type" value="Nhà riêng" <%= userInfo?.housing_type === 'Nhà riêng' ? 'checked' : '' %> required /> Nhà riêng</label>
+              <label class="ml-4"><input type="radio" name="housing_type" value="Công ty" <%= userInfo?.housing_type === 'Công ty' ? 'checked' : '' %> /> Công ty</label>
+            </div>
+
+            <!-- Ẩn dữ liệu giỏ hàng để gửi lên server -->
+            <% cartItems.forEach(item => { %>
+              <input type="hidden" name="items[]" value='<%= JSON.stringify(item) %>' />
+            <% }) %>
+
+            <form action="/api/cart/order" method="POST" class="text-right">
+                <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
+                  Xác nhận đặt hàng
+                </button>
+              </form>
+          </form>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <%- include('partials/footer') %>
+
+  <script>
+    const modal = document.getElementById('checkout-modal');
+  
+    function openCheckoutModal() {
+      modal.classList.remove('hidden');
+    }
+
+    modal.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+  </script>
+</body>
+</html>

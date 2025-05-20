@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Tìm kiếm sản phẩm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body >
+    <%- include('partials/header') %>
+
+    <div class="max-w-full mx-auto bg-white p-6 rounded-lg shadow-md min-h-screen">
+        <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Tìm kiếm sản phẩm</h1>
+
+        <form method="get" action="/api/products/search-view" class="flex flex-wrap gap-4 mb-6 justify-center">
+            <input 
+                type="text" 
+                name="q" 
+                placeholder="Từ khóa..." 
+                value="<%= q || '' %>" 
+                class="flex-grow border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-md"
+            >
+            <select 
+                name="category_id" 
+                class="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+                <option value="">-- Tất cả danh mục --</option>
+                <% categories.forEach(cat => { %>
+                    <option value="<%= cat.id %>" <%= (cat.id == category_id) ? 'selected' : '' %>><%= cat.name %></option>
+                <% }) %>
+            </select>
+            <button 
+                type="submit" 
+                class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
+            >
+                Tìm
+            </button>
+        </form>
+
+        <% if (products && products.length > 0) { %>
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Kết quả:</h2>
+            <!-- Dùng grid 4 cột, gap 6 -->
+            <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <% products.forEach(prod => { %>
+                    <li class="border border-gray-200 rounded p-4 shadow-sm hover:shadow-md transition flex flex-col items-center">
+                        <img 
+                          src="<%= prod.image %>" 
+                          alt="<%= prod.name %>" 
+                          class="w-full h-40 object-cover rounded mb-4"
+                          onerror="this.src='/images/no-image.png'" 
+                        />
+                        <strong class="text-lg text-gray-900 text-center"><%= prod.name %></strong>
+                        <span class="text-blue-600 font-medium mt-1 text-center">
+                            <%= Number(prod.base_price).toLocaleString('vi-VN') %> VNĐ
+                        </span>
+                        <em class="text-gray-600 text-sm mt-1 text-center"><%= prod.category_name %></em>
+                    </li>
+                <% }) %>
+            </ul>
+        <% } else if (q || category_id) { %>
+            <p class="text-center text-gray-500 italic mt-6">Không tìm thấy sản phẩm phù hợp.</p>
+        <% } %>
+    </div>
+
+    <%- include('partials/footer') %>
+</body>
+</html>
