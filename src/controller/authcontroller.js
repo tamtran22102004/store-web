@@ -75,7 +75,7 @@ const postLogin = async (req, res) => {
 }
  const getdashboard =  async(req, res) => {
     const user = req.user;
-    const [categories, fields] = await db.execute('SELECT * FROM store.categories;');
+    const [categories, fields] = await db.execute('SELECT * FROM categories;');
     res.render('dashboard', { user,categories});
 };
   const getRegister = (req, res) => {
